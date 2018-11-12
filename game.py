@@ -13,26 +13,35 @@ class CELLS(object):
     def __init__(self):
         self.cells=[[0 for x in range(14)] for y in range(25)]
         self.rects=[[0 for x in range(14)] for y in range(25)]
-        self.ids=[]
     def add(self,Surface,Rect):
         print(self.cells)
         print((Rect.y-50)//25,(Rect.x-30)//25)
         self.cells[(Rect.y-50)//25][(Rect.x-30)//25]=1
         self.rects[(Rect.y-50)//25][(Rect.x-30)//25]=[Surface,Rect]
-        self.ids.append([(Rect.y-50)//25,(Rect.x-30)//25])
     def print(self):
         for i in range(14):
             for j in range(25):
                 print(self.cells[i][j],end="")
             print("\n",end="")
     def blit(self,WINDOW):
-        for i in self.ids: 
-            WINDOW.blit(*self.rects[i[0]][i[1]])
+        for i in self.rects:
+            for j in i:
+                if type(j)==type(list()):
+                    WINDOW.blit(*j)
     def is_one(self,i,j):
         if(self.cells[i][j]):
             return True
         else:
             return False
+    def delete_line(self,y):
+        for i in range(1,y+1,-1):
+            for j in range(len(self.cells[i])):
+                self.cells[i][j]=self.cells[i-1][j]
+                self.rects[i][j][1].y+=25
+                self.rects=[i][j]=self.rects[i-1][j]
+        for i in range(len(self.cells[0])):
+            self.cells[0][i]=0
+            self.rects[0][i]=0
 pygame.init()
 WINDOW=pygame.display.set_mode((600,700),0,32)
 pygame.display.set_caption("TETRIS")
