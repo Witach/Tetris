@@ -1,12 +1,31 @@
 import pygame,sys
-def give_cell():
+import random
+def give_cell(x=0,y=0):
     lista=[pygame.Surface((25,25))]
     lista.append(lista[0].get_rect())
     lista[0].fill((255,0,0))
-    lista[1].x=30
-    lista[1].y=25
+    lista[1].x=30+x
+    lista[1].y=25+y
     pygame.draw.rect(lista[0],(150,150,150),(0,0,25,25),5)
     return lista
+class block(object):
+    def __init__(self,number):
+        self.cellls=[]
+        self.x=8*25
+        self.y=2*25
+        self.wich=int(random.random()*8)
+        self.blocks=[
+            [[0,0],[0,25],[25,25],[25,0]],
+            [[0,0],[25,0],[50,0],[50,-25]],
+            [[0,0],[25,0],[25,25],[50,25]],
+            [[0,0],[25,0],[25,25],[50,0]],
+            [[0,0],[25,0],[25,-25],[50,-25]],
+            [[0,0],[25,0],[50,0],[50,25]],
+            [[0,0],[25,0],[50,0],[75,0]],
+            [[0,0]]
+            for i in self.blocks[self.wich]
+                self.cells.append(give_cell(self.x+i[0],self.y+i[1]))
+        
 class CONTROL(object):
     def __init__(self):
         self.c=give_cell()
@@ -103,6 +122,11 @@ class CELLS(object):
                 #print(i)
                 return i
         return -1
+    def can_move(self,kierunek,bloki):
+        if kierunek=="left":
+            if(self.c[1].y<650) and  not komory.is_one((self.c[1].y-50+25)//25,(self.c[1].x-30)//25):
+        if kierunek=="right":
+        if keirunek=="down":
 pygame.init()
 WINDOW=pygame.display.set_mode((600,700),0,32)
 pygame.display.set_caption("TETRIS")
