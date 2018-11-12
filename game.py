@@ -28,6 +28,11 @@ class CELLS(object):
     def blit(self,WINDOW):
         for i in self.ids: 
             WINDOW.blit(*self.rects[i[0]][i[1]])
+    def is_one(self,i,j):
+        if(self.cells[i][j]):
+            return True
+        else:
+            return False
 pygame.init()
 WINDOW=pygame.display.set_mode((600,700),0,32)
 pygame.display.set_caption("TETRIS")
@@ -47,15 +52,15 @@ while True:
             pygame.quit()
         if event.type==pygame.KEYDOWN:
             if(event.key==pygame.K_a and a_pressed==0):
-                if(c[1].x>30):
+                if(c[1].x>30) and  not komory.is_one((c[1].y-50)//25,(c[1].x-30-25)//25):
                     c[1].x-=25
                 a_pressed=1
             if(event.key==pygame.K_d and d_pressed==0):
-                if(c[1].x<350):
+                if(c[1].x<350) and  not komory.is_one((c[1].y-50)//25,(c[1].x-30+25)//25):
                     c[1].x+=25
                 d_pressed=1
             if event.key==pygame.K_s and s_pressed==0:
-                if  c[1].y<650:
+                if  c[1].y<650 and  not komory.is_one((c[1].y-50+25)//25,(c[1].x-30)//25):
                     c[1].y+=25
                 s_pressed=1
         if event.type==pygame.KEYUP:
@@ -67,19 +72,19 @@ while True:
                 s_pressed=0
         pressed=1
     if d_pressed and pressed==0:
-        if(c[1].x<350):
+        if(c[1].x<350) and  not komory.is_one((c[1].y-50)//25,(c[1].x-30+25)//25):
             c[1].x+=25
             d_pressed=1
-    if a_pressed and pressed==0:
-        if(c[1].x>30):
+    if a_pressed and pressed==0 :
+        if(c[1].x>30) and  not komory.is_one((c[1].y-50)//25,(c[1].x-30-25)//25):
             c[1].x-=25
             a_pressed=1
     if s_pressed and pressed==0:
-        if(c[1].y<650):
+        if(c[1].y<650) and  not komory.is_one((c[1].y-50+25)//25,(c[1].x-30)//25):
             c[1].y+=25
             s_pressed=1
     if skip==5:
-        if c[1].y<645: 
+        if c[1].y<645 and  not komory.is_one((c[1].y-50+25)//25,(c[1].x-30)//25): 
             l+=1
             c[1].y+=25
             #print(c[1].y,c[1].x)
