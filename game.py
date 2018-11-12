@@ -71,8 +71,8 @@ class CELLS(object):
         self.cells[(Rect.y-50)//25][(Rect.x-30)//25]=1
         self.rects[(Rect.y-50)//25][(Rect.x-30)//25]=[Surface,Rect]
     def print(self):
-        for i in range(14):
-            for j in range(25):
+        for i in range(len(self.cells)):
+            for j in range(len(self.cells[i])):
                 print(self.cells[i][j],end="")
             print("\n",end="")
     def blit(self,WINDOW):
@@ -86,18 +86,21 @@ class CELLS(object):
         else:
             return False
     def delete_line(self,y):
-        for i in range(1,y+1,-1):
-            for j in range(len(self.cells[i])):
+        print("elo")
+        for i in range(y,0,-1):
+            print(i)
+            for j in range(len(self.cells[i])):                
                 self.cells[i][j]=self.cells[i-1][j]
-                self.rects[i][j][1].y+=25
-                self.rects=[i][j]=self.rects[i-1][j]
+                if self.rects[i][j]!=0:
+                    self.rects[i][j][1].y+=25
+                self.rects[i][j]=self.rects[i-1][j]
         for i in range(len(self.cells[0])):
             self.cells[0][i]=0
             self.rects[0][i]=0
     def is_line(self):
         for i in range(len(self.cells)-1,-1,-1):
-            print(i)
             if sum(self.cells[i])==len(self.cells[i]):
+                #print(i)
                 return i
         return -1
 pygame.init()
@@ -106,10 +109,6 @@ pygame.display.set_caption("TETRIS")
 CLOCK=pygame.time.Clock()
 c=give_cell()
 komory=CELLS()
-a_pressed=0
-d_pressed=0
-s_pressed=0
-pressed=0
 l=0
 keys=CONTROL()
 while True:
