@@ -7,8 +7,60 @@ def give_cell():
     lista[1].y=25
     pygame.draw.rect(lista[0],(150,150,150),(0,0,25,25),5)
     return lista
-def colide(CELLS,BLOCK):
-    print()
+class CONTROL(object):
+    def __init__(self):
+        self.c=give_cell()
+        self.a_pressed=0
+        self.d_pressed=0
+        self.s_pressed=0
+        self.pressed=0
+        self.skip=0
+    def k_down(self,key,komory):
+        if(key==pygame.K_a and self.a_pressed==0):
+                self.move_left(komory)
+                self.a_pressed=1
+        if(key==pygame.K_d and self.d_pressed==0):
+                self.move_right(komory)
+                self.d_pressed=1
+        if key==pygame.K_s and self.s_pressed==0:
+                self.move_down(komory)
+                self.s_pressed=1
+        self.pressed=1
+    def k_up(self,key):
+        if key==pygame.K_a:
+                self.a_pressed=0
+        if key==pygame.K_d:
+                self.d_pressed=0
+        if key==pygame.K_s:
+                self.s_pressed=0
+        self.pressed=1
+    def cycle(self,komory):
+        if self.d_pressed and self.pressed==0:
+            self.move_right(komory)
+        if self.a_pressed and self.pressed==0:
+            self.move_left(komory)
+        if self.s_pressed and self.pressed==0:
+            self.move_down(komory)
+    def move_down(self,komory):
+         if(self.c[1].y<650) and  not komory.is_one((self.c[1].y-50+25)//25,(self.c[1].x-30)//25):
+                self.c[1].y+=25
+         else:
+                komory.add(*(self.c))
+                self.c=give_cell()
+                self.c[1].y=25
+                self.c[1].x=30
+                self.skip=0
+                is_line=komory.is_line()
+                self.s_pressed=0
+                while is_line!=-1:
+                     komory.delete_line(is_line)
+                     is_line=komory.is_line()
+    def move_left(self,komory):
+        if(self.c[1].x>30) and  not komory.is_one((self.c[1].y-50)//25,(self.c[1].x-30-25)//25):
+                self.c[1].x-=25
+    def move_right(self,komory):
+        if(self.c[1].x<350) and  not komory.is_one((self.c[1].y-50)//25,(self.c[1].x-30+25)//25):
+                self.c[1].x+=25
 class CELLS(object):
     def __init__(self):
         self.cells=[[0 for x in range(14)] for y in range(25)]
@@ -42,6 +94,12 @@ class CELLS(object):
         for i in range(len(self.cells[0])):
             self.cells[0][i]=0
             self.rects[0][i]=0
+    def is_line(self):
+        for i in range(len(self.cells)-1,-1,-1):
+            print(i)
+            if sum(self.cells[i])==len(self.cells[i]):
+                return i
+        return -1
 pygame.init()
 WINDOW=pygame.display.set_mode((600,700),0,32)
 pygame.display.set_caption("TETRIS")
@@ -53,65 +111,27 @@ d_pressed=0
 s_pressed=0
 pressed=0
 l=0
-skip=0
-#14/25
+keys=CONTROL()
 while True:
     for event in pygame.event.get():
         if event.type==pygame.QUIT:
             pygame.quit()
         if event.type==pygame.KEYDOWN:
-            if(event.key==pygame.K_a and a_pressed==0):
-                if(c[1].x>30) and  not komory.is_one((c[1].y-50)//25,(c[1].x-30-25)//25):
-                    c[1].x-=25
-                a_pressed=1
-            if(event.key==pygame.K_d and d_pressed==0):
-                if(c[1].x<350) and  not komory.is_one((c[1].y-50)//25,(c[1].x-30+25)//25):
-                    c[1].x+=25
-                d_pressed=1
-            if event.key==pygame.K_s and s_pressed==0:
-                if  c[1].y<650 and  not komory.is_one((c[1].y-50+25)//25,(c[1].x-30)//25):
-                    c[1].y+=25
-                s_pressed=1
+            keys.k_down(event.key,komory)
         if event.type==pygame.KEYUP:
-            if event.key==pygame.K_a:
-                a_pressed=0
-            if event.key==pygame.K_d:
-                d_pressed=0
-            if event.key==pygame.K_s:
-                s_pressed=0
-        pressed=1
-    if d_pressed and pressed==0:
-        if(c[1].x<350) and  not komory.is_one((c[1].y-50)//25,(c[1].x-30+25)//25):
-            c[1].x+=25
-            d_pressed=1
-    if a_pressed and pressed==0 :
-        if(c[1].x>30) and  not komory.is_one((c[1].y-50)//25,(c[1].x-30-25)//25):
-            c[1].x-=25
-            a_pressed=1
-    if s_pressed and pressed==0:
-        if(c[1].y<650) and  not komory.is_one((c[1].y-50+25)//25,(c[1].x-30)//25):
-            c[1].y+=25
-            s_pressed=1
-    if skip==5:
-        if c[1].y<645 and  not komory.is_one((c[1].y-50+25)//25,(c[1].x-30)//25): 
-            l+=1
-            c[1].y+=25
-            #print(c[1].y,c[1].x)
-            skip=0
-        else:
-            komory.add(*c)
-            c=give_cell()
-            c[1].y=25
-            c[1].x=30
-            skip=0
-    pressed=0
-    skip+=1
+            keys.k_up(event.key)
+    keys.cycle(komory)
+    if keys.skip==5:
+        keys.move_down(komory)
+        keys.skip=0
+    keys.pressed=0
+    keys.skip+=1
     WINDOW.fill((0,0,0))
     pygame.draw.line(WINDOW,(255,255,255),(24,20),(24,680),10)
     pygame.draw.line(WINDOW,(255,255,255),(385,20),(385,680),10)
     pygame.draw.line(WINDOW,(255,255,255),(20,20),(390,20),10)
     pygame.draw.line(WINDOW,(255,255,255),(20,680),(390,680),10)
-    WINDOW.blit(*c)
+    WINDOW.blit(*(keys.c))
     komory.blit(WINDOW)
     pygame.display.update()
     CLOCK.tick_busy_loop(10)
