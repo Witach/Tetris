@@ -9,18 +9,26 @@ def give_cell(x=0,y=0):
     pygame.draw.rect(lista[0],(150,150,150),(0,0,25,25),5)
     return lista
 class block(object):
-    def __init__(self,number):
-        self.cellls=[]
+    def __init__(self):
+        self.cells=[]
         self.x=8*25
         self.y=2*25
         self.wich=int(random.random()*8)
         self.blocks=[[[0,0],[0,25],[25,25],[25,0]],[[0,0],[25,0],[50,0],[50,-25]],[[0,0],[25,0],[25,25],[50,25]],[[0,0],[25,0],[25,25],[50,0]],[[0,0],[25,0],[25,-25],[50,-25]], [[0,0],[25,0],[50,0],[50,25]],[[0,0],[25,0],[50,0],[75,0]],[[0,0]]]
         for i in self.blocks[self.wich]:
-            self.cells.append(give_cell(self.x+i[0],self.y+i[1]))
-        
+            self.cells.append(give_cell(self.x+i[0]+25,self.y+i[1]+50))
+    def move_down(self):
+        for i in self.cells:
+            i[1].y+=25
+    def move_left(self):
+        for i in self.cells:
+            i[1].x-=25
+    def move_right(self):
+        for i in self.cells:
+            i[1].x+=25
 class CONTROL(object):
     def __init__(self):
-        self.c=give_cell()
+        self.c=block()
         self.a_pressed=0
         self.d_pressed=0
         self.s_pressed=0
@@ -53,13 +61,11 @@ class CONTROL(object):
         if self.s_pressed and self.pressed==0:
             self.move_down(komory)
     def move_down(self,komory):
-         if(self.c[1].y<650) and  not komory.is_one((self.c[1].y-50+25)//25,(self.c[1].x-30)//25):
-                self.c[1].y+=25
+         if komory.can_move("down",self.c.cells):
+                self.c.move_down()
          else:
-                komory.add(*(self.c))
-                self.c=give_cell()
-                self.c[1].y=25
-                self.c[1].x=30
+                komory.add(*(self.c.cells))
+                self.c=block()
                 self.skip=0
                 is_line=komory.is_line()
                 self.s_pressed=0
@@ -67,11 +73,15 @@ class CONTROL(object):
                      komory.delete_line(is_line)
                      is_line=komory.is_line()
     def move_left(self,komory):
-        if(self.c[1].x>30) and  not komory.is_one((self.c[1].y-50)//25,(self.c[1].x-30-25)//25):
-                self.c[1].x-=25
+        if komory.can_move("left",self.c.cells):
+                self.c.move_left()
     def move_right(self,komory):
-        if(self.c[1].x<350) and  not komory.is_one((self.c[1].y-50)//25,(self.c[1].x-30+25)//25):
-                self.c[1].x+=25
+        if komory.can_move("right",self.c.cells):
+                self.c.move_right()
+    def blit(self,surface):
+        for i in self.c.cells:
+            surface.blit(*i)
+        
 class CELLS(object):
     def __init__(self):
         self.cells=[[0 for x in range(14)] for y in range(25)]
@@ -114,17 +124,24 @@ class CELLS(object):
                 #print(i)
                 return i
         return -1
-   # def can_move(self,kierunek,bloki):
-       # if kierunek=="left":
-       #     for i in bloki:
-       #         if(i[1].y<650) and  not komory.is_one((self.c[1].y-50+25)//25,(self.c[1].x-30)//25):
-       # if kierunek=="right":
-       # if keirunek=="down":
+    def can_move(self,kierunek,bloki):
+        if kierunek=="left":
+            for i in bloki:
+                if not ((i[1].y<650) and  not komory.is_one((i[1].y-50)//25,(i[1].x-30-25)//25)):
+                    return False
+        if kierunek=="right":
+            for i in bloki:
+                if not ((i[1].y<650) and  not komory.is_one((i[1].y-50)//25,(i[1].x-30+25)//25)):
+                    return False
+        if kierunek=="down":
+            for i in bloki:
+                if not ((i[1].y<650) and  not komory.is_one((i[1].y-50+25)//25,(i[1].x-30)//25)):
+                    return False
+        return True
 pygame.init()
 WINDOW=pygame.display.set_mode((600,700),0,32)
 pygame.display.set_caption("TETRIS")
 CLOCK=pygame.time.Clock()
-c=give_cell()
 komory=CELLS()
 l=0
 keys=CONTROL()
@@ -147,7 +164,7 @@ while True:
     pygame.draw.line(WINDOW,(255,255,255),(385,20),(385,680),10)
     pygame.draw.line(WINDOW,(255,255,255),(20,20),(390,20),10)
     pygame.draw.line(WINDOW,(255,255,255),(20,680),(390,680),10)
-    WINDOW.blit(*(keys.c))
+    keys.blit(WINDOW)
     komory.blit(WINDOW)
     pygame.display.update()
     CLOCK.tick_busy_loop(10)
