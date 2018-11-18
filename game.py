@@ -12,11 +12,11 @@ class block(object):
     def __init__(self):
         self.cells=[]
         self.x=8*25
-        self.y=2*25
+        self.y=0
         self.wich=int(random.random()*8)
         self.blocks=[[[0,0],[0,25],[25,25],[25,0]],[[0,0],[25,0],[50,0],[50,-25]],[[0,0],[25,0],[25,25],[50,25]],[[0,0],[25,0],[25,25],[50,0]],[[0,0],[25,0],[25,-25],[50,-25]], [[0,0],[25,0],[50,0],[50,25]],[[0,0],[25,0],[50,0],[75,0]],[[0,0]]]
         for i in self.blocks[self.wich]:
-            self.cells.append(give_cell(self.x+i[0]+25,self.y+i[1]+50))
+            self.cells.append(give_cell(self.x+i[0]+25,self.y+i[1]))
     def move_down(self):
         for i in self.cells:
             i[1].y+=25
@@ -26,6 +26,8 @@ class block(object):
     def move_right(self):
         for i in self.cells:
             i[1].x+=25
+    #def rotate(self)
+        #???
 class CONTROL(object):
     def __init__(self):
         self.c=block()
@@ -64,7 +66,8 @@ class CONTROL(object):
          if komory.can_move("down",self.c.cells):
                 self.c.move_down()
          else:
-                komory.add(*(self.c.cells))
+                for i in self.c.cells:
+                    komory.add(*i)
                 self.c=block()
                 self.skip=0
                 is_line=komory.is_line()
@@ -127,11 +130,11 @@ class CELLS(object):
     def can_move(self,kierunek,bloki):
         if kierunek=="left":
             for i in bloki:
-                if not ((i[1].y<650) and  not komory.is_one((i[1].y-50)//25,(i[1].x-30-25)//25)):
+                if not ((i[1].x>30) and  not komory.is_one((i[1].y-50)//25,(i[1].x-30-25)//25)):
                     return False
         if kierunek=="right":
             for i in bloki:
-                if not ((i[1].y<650) and  not komory.is_one((i[1].y-50)//25,(i[1].x-30+25)//25)):
+                if not ((i[1].x<350) and  not komory.is_one((i[1].y-50)//25,(i[1].x-30+25)//25)):
                     return False
         if kierunek=="down":
             for i in bloki:
